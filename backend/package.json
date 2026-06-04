@@ -12,7 +12,12 @@
   "type": "module",
   "dependencies": {
     "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
     "fastify": "^5.8.5",
+    "jsonwebtoken": "^9.0.3",
     "socket.io": "^4.8.3"
+  },
+  "devDependencies": {
+    "@types/jsonwebtoken": "^9.0.10"
   }
 }
