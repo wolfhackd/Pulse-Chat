@@ -3,9 +3,9 @@ import jwt, { type JwtPayload, type SignOptions } from "jsonwebtoken";
 const JWT_SECRET = process.env.JWT_SECRET || 'secret';
 
 export interface UserPayload extends JwtPayload {
-    username: string;
-    userId: string;
-    email: string;
+    username?: string;
+    userId?: string;
+    email?: string;
 }
 
 export const JwtUtil = {
