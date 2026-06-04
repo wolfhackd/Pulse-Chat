@@ -1,9 +1,8 @@
 import {type FastifyRequest,type FastifyReply} from "fastify";
-import { JwtUtil } from "../utils/jwt.util.js";
+import { JwtUtil, type UserPayload } from "../utils/jwt.util.js";
 
 interface AuthenticatedRequest extends FastifyRequest {
-  userId: string;
-  username: string;
+  user: UserPayload;
 }
 
 export const authMiddleware = (req: AuthenticatedRequest, res: FastifyReply, next: any) => {
@@ -17,10 +16,8 @@ export const authMiddleware = (req: AuthenticatedRequest, res: FastifyReply, nex
 
     try {
     const decoded = JwtUtil.verifyToken(token);
-    
-    req.userId = decoded.userId;
-    req.username= decoded.username;
-    
+
+    req.user = decoded;
     
     next();
   } catch (error) {
