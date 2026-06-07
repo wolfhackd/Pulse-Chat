@@ -13,4 +13,12 @@ export class UserRepository {
             }
         })
     }
+
+    async findByEmail(email: string) {
+        return await this.database.user.findUnique({
+            where: {
+                email
+            }
+        })
+    }
 }
