@@ -6,6 +6,7 @@ import { Server } from "socket.io";
 
 import { UserRoutes } from "./modules/users/user.routes.js";
 import prisma from "./database/db.js";
+import { AuthRoute } from "./modules/auth/auth.route.js";
 
 
 
@@ -13,6 +14,7 @@ const app = fastify({logger:true});
 
 // Routes
 app.register(UserRoutes);
+app.register(AuthRoute);
 
 // const io = new Server(app.server,{
 //     cors:{
