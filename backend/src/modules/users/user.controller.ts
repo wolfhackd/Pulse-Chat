@@ -1,14 +1,15 @@
+import type { FastifyReply, FastifyRequest } from "fastify";
 import type { UserService } from "./user.service.js";
 
 
 export class UserController {
     constructor(private readonly userService: UserService) {}
 
-    createUser = async (request: any, reply: any) => {
+    createUser = async (request: FastifyRequest, reply: FastifyReply) => {
 
         try{
 
-            const { username, email, password } = request.body;
+            const { username, email, password } = request.body as { username: string; email: string; password: string };
             
             if (!username || !email || !password) {
                 throw new Error('Missing required fields');

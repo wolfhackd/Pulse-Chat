@@ -4,7 +4,7 @@ import type { UserRepository } from "./user.repository.js";
 export class UserService {
     constructor(readonly userRepository: UserRepository) {}
 
-    async createUser(username: string, email: string, password: string) {
+    createUser = async (username: string, email: string, password: string) => {
 
         const hashedPassword = await hashPassword(password);
 
@@ -13,7 +13,7 @@ export class UserService {
         return newUser;
     }
 
-    async getUserByEmail(email: string) {
+    getUserByEmail = async (email: string) => {
         const user = await this.userRepository.findByEmail(email);
         return user;
     }
