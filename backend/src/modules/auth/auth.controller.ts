@@ -5,22 +5,32 @@ import type { AuthService } from "./auth.service.js";
 export class AuthController {
     constructor(readonly authService: AuthService) {}
 
-     login = async (req: FastifyRequest, res: FastifyReply) => {
+    login = async (req: FastifyRequest, reply: FastifyReply) => {
 
         try{
             const { email, password } = req.body as { email: string; password: string };
             
             if (!email || !password) {
-                return res.status(400).send({ error: 'Missing required fields' });
+               throw new Error('Missing required fields');
             }
-    
+
+            if (typeof email !== 'string' || typeof password !== 'string') {
+                throw new Error('Invalid field types');
+            }
+
+            if (email.trim() === '' || password.trim() === '') {
+                throw new Error('Fields cannot be empty');
+            }
+            //salvar em cookie
             const token = await this.authService.login(email, password);
-    
-            return res.status(200).send({ token });
+
+            return reply.status(200).send({ token });
 
         } catch (error) {
-            console.error("Login error:", error);
-            return res.status(401).send({ error: 'Invalid email or password' });
+            if (error instanceof Error) {
+                return reply.status(400).send({ error: error.message });
+            }
+            return reply.status(401).send({ error: 'Invalid email or password' });
         }
-        }
+    }
 }
