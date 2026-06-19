@@ -8,8 +8,6 @@ export class UserController {
     createUser = async (request: FastifyRequest, reply: FastifyReply) => {
 
         try{
-            //preciso adicionar uma parte dizendo se o email já existe, para não criar usuários duplicados
-
             const { username, email, password } = request.body as { username: string; email: string; password: string };
             
             if (!username || !email || !password) {

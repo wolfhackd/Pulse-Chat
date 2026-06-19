@@ -21,4 +21,12 @@ export class UserRepository {
             }
         })
     }
+
+    findByUsername = async (username: string) => {
+        return await this.database.user.findUnique({
+            where: {
+                username
+            }
+        })
+    }
 }

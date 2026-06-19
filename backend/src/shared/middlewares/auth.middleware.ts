@@ -1,7 +1,7 @@
 import {type FastifyRequest,type FastifyReply} from "fastify";
 import { JwtUtil, type UserPayload } from "../utils/jwt.util.js";
 
-interface AuthenticatedRequest extends FastifyRequest {
+export interface AuthenticatedRequest extends FastifyRequest {
   user?: UserPayload;
 }
 
