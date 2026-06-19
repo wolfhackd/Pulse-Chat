@@ -14,6 +14,7 @@ import {
   FieldLabel,
 } from "~/components/ui/field"
 import { Input } from "~/components/ui/input"
+import { handleSubmitSignup } from "~/signup/signup"
 
 export function SignupForm({
   className,
@@ -29,16 +30,17 @@ export function SignupForm({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form>
+          <form onSubmit={handleSubmitSignup}>
             <FieldGroup>
               <Field>
                 <FieldLabel htmlFor="username">Username</FieldLabel>
-                <Input id="username" type="text" placeholder="John Doe" required />
+                <Input id="username" name="username" type="text" placeholder="John Doe" required />
               </Field>
               <Field>
                 <FieldLabel htmlFor="email">Email</FieldLabel>
                 <Input
                   id="email"
+                  name="email"
                   type="email"
                   placeholder="m@example.com"
                   required
@@ -48,13 +50,13 @@ export function SignupForm({
                 <Field className="grid grid-cols-2 gap-4">
                   <Field>
                     <FieldLabel htmlFor="password">Senha</FieldLabel>
-                    <Input id="password" type="password" required />
+                    <Input id="password" name="password" type="password" placeholder="*******" minLength={8} required />
                   </Field>
                   <Field>
                     <FieldLabel htmlFor="confirm-password">
                       Confirmar Senha
                     </FieldLabel>
-                    <Input id="confirm-password" type="password" required />
+                    <Input id="confirm-password" name="confirm-password" type="password" placeholder="*******" minLength={8} required />
                   </Field>
                 </Field>
                 <FieldDescription>

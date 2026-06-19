@@ -14,6 +14,8 @@ import {
   FieldLabel,
 } from "~/components/ui/field"
 import { Input } from "~/components/ui/input"
+import type React from "react"
+import { handleSubmitLogin } from "~/login/login"
 
 export function LoginForm({
   className,
@@ -29,12 +31,13 @@ export function LoginForm({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form>
+          <form onSubmit={handleSubmitLogin}>
             <FieldGroup>
               <Field>
                 <FieldLabel htmlFor="email">Email</FieldLabel>
                 <Input
                   id="email"
+                  name="email"
                   type="email"
                   placeholder="m@example.com"
                   required
@@ -50,7 +53,7 @@ export function LoginForm({
                     Esqueceu a senha?
                   </a>
                 </div>
-                <Input id="password" type="password" required />
+                <Input id="password" name="password" type="password" minLength={8} placeholder="********" required />
               </Field>
               <Field>
                 <Button type="submit">Login</Button>
