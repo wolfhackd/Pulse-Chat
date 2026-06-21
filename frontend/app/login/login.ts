@@ -17,9 +17,17 @@ export const handleSubmitLogin = async (e: React.SubmitEvent<HTMLFormElement>) =
     console.log("Password:", password);
     console.log(import.meta.env.VITE_API_URL);
 
-    const response = await axios.post(`${import.meta.env.VITE_API_URL}/auth/login`, {
-        email,
-        password
-    })
-    console.log(response.data);
+    try{
+        const response = await axios.post(`${import.meta.env.VITE_API_URL}/auth/login`, {
+            email,
+            password
+        })
+        console.log(response.data);
+        // toast.success("Login realizado com sucesso!");
+        //O token sai aqui
+        //tenho que ir pra uma lista de salas
+    } catch (error) {
+        console.error(error);
+        toast.error("Erro ao realizar login!");
+    }
   }
