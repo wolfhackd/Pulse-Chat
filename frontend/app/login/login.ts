@@ -1,5 +1,6 @@
 import { toast } from "sonner";
 import axios from "axios";
+import { connectSocket } from "~/config/socket/socket";
 
 export const handleSubmitLogin = async (e: React.SubmitEvent<HTMLFormElement>) =>{
     e.preventDefault();
@@ -23,9 +24,12 @@ export const handleSubmitLogin = async (e: React.SubmitEvent<HTMLFormElement>) =
             password
         })
         console.log(response.data);
-        // toast.success("Login realizado com sucesso!");
-        //O token sai aqui
+        localStorage.setItem("token", response.data.token);
+        toast.success("Login realizado com sucesso!");
+        connectSocket();
         //tenho que ir pra uma lista de salas
+        //Algo no /room
+        window.location.replace("/room/1");
     } catch (error) {
         console.error(error);
         toast.error("Erro ao realizar login!");

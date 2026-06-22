@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useParams } from "react-router"
 
 import { Button } from "~/components/ui/button"
@@ -11,6 +11,7 @@ import {
   CardTitle,
 } from "~/components/ui/card"
 import { Input } from "~/components/ui/input"
+import { socket } from "~/config/socket/socket"
 
 const onlineUsers = [
   { name: "Ana", status: "Editando slides", online: true },
@@ -57,6 +58,15 @@ export function RoomPage() {
     ])
     setMessage("")
   }
+
+  useEffect(() =>{
+
+    socket.emit("join_room", roomName)
+
+    return () => {
+    socket.disconnect();
+  };
+  }, [roomName])
 
   return (
     <main className="min-h-screen bg-muted p-6">

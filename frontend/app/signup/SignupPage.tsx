@@ -1,5 +1,3 @@
-"use client"
-
 import { SignupForm } from "~/components/signup-form"
 import { HugeiconsIcon } from "@hugeicons/react"
 import { LayoutBottomIcon } from "@hugeicons/core-free-icons"

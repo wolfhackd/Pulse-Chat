@@ -21,21 +21,16 @@ export const handleSubmitSignup = async (e: React.SubmitEvent<HTMLFormElement>) 
         return;
     }
 
-    console.log("Username:", username);
-    console.log("Email:", email);
-    console.log("Password:", password);
-    console.log("Confirm Password:", confirmPassword);
-
     try{
         const response = await axios.post(`${import.meta.env.VITE_API_URL}/users`, {
             username,
             email,
             password
         })
+        
 
-        console.log(response.data);
         toast.success("Cadastro realizado com sucesso!");
-        // Redirect to login
+        window.location.replace("/login");
     } catch(err){
         console.log(err);
     }
