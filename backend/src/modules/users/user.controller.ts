@@ -21,6 +21,10 @@ export class UserController {
             if (username.trim() === '' || email.trim() === '' || password.trim() === '') {
                 throw new Error('Fields cannot be empty');
             }
+
+            if (password.length < 8) {
+                throw new Error('Password must be at least 8 characters');
+            }
             
             const user = await this.userService.createUser(username, email, password);
             

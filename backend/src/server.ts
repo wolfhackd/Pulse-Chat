@@ -28,36 +28,34 @@ const io = new Server(app.server,{
 })
 
 //Login
-// io.use((socket, next) => {
-//   const token = socket.handshake.auth.token;
+io.use((socket, next) => {
+  const token = socket.handshake.auth.token;
 
-//   if (!token) {
-//     return next(new Error("Token não enviado"));
-//   }
+  if (!token) {
+    return next(new Error("Token não enviado"));
+  }
 
-//   try {
-//     const decoded = JwtUtil.verifyToken(token);
+  try {
+    const decoded = JwtUtil.verifyToken(token);
 
-//     socket.data.user = decoded;
-//     next();
-//   } catch {
-//     next(new Error("Token inválido"));
-//   }
-// });
+    socket.data.user = decoded;
+    next();
+  } catch {
+    next(new Error("Token inválido"));
+  }
+});
 
 //Posso gerenciar os eventos do socket.io aqui
 
 io.on("connection",(socket)=>{
-    console.log("Usuário conectado", socket.id);
+    console.log("Usuário conectado", socket.data.user,);
 
    socket.on('join_room', (roomId) =>{
-    // socket.join(roomId);
+    socket.join(roomId);
     console.log(`Usuário ${socket.id} entrou na sala`);
     io.to(roomId).emit('user_joined', {
-        // username: socket.data.user.username,
-         username:socket.id,
-        // message: `Usuário ${socket.data.user.username} entrou na sala`
-        message: `Usuário ${socket.id} entrou na sala`
+        username: socket.data.user.username,
+        message: `Usuário ${socket.data.user.username} entrou na sala`
     });
    })
 
@@ -65,9 +63,7 @@ io.on("connection",(socket)=>{
     io.to(data.room).emit(
         "receive_message",
         {
-            // id: socket.id,
-            // username: socket.data.user.username,
-            username:socket.id,
+            username: socket.data.user.username,
             message: data.message,
         }
     );
@@ -77,10 +73,8 @@ io.on("connection",(socket)=>{
     socket.on("disconnect", (data)=>{
         console.log("Usuário desconectado", socket.id);
             io.emit('user_left', {
-            // username: socket.data.user.username,
-            username:socket.id,
-            // message: `Usuário ${socket.data.user.username} saiu da sala`
-            message: `Usuário ${socket.id} saiu da sala`
+            username: socket.data.user.username,
+            message: `Usuário ${socket.data.user.username} saiu da sala`
         });
     })
 })
