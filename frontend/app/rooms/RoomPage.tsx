@@ -33,6 +33,27 @@ type ChatMessage = {
   time: string
 }
 
+
+// --------------------------------------------------------------------------------------------------------------------
+//  Join Room
+//  Online/Offline Users
+//  Digitando no chat
+//
+//
+//  Corpo de Mensagem
+//  Preciso de: 
+//  Nome da sala
+//  Nome do usuário
+//  Texto da mensagem
+//  Data da mensagem
+//  Hora da mensagem
+//
+//
+//
+//
+//
+// --------------------------------------------------------------------------------------------------------------------
+
 export function RoomPage() {
   const params = useParams()
   const roomName = params.roomId
@@ -47,26 +68,52 @@ export function RoomPage() {
     const trimmed = message.trim()
     if (!trimmed) return
 
-    setMessages((current) => [
-      ...current,
-      {
-        id: current.length + 1,
-        user: "Você",
-        text: trimmed,
-        time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-      },
-    ])
+    // setMessages((current) => [
+    //   ...current,
+    //   {
+    //     id: current.length + 1,
+    //     user: "Você",
+    //     text: trimmed,
+    //     time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+    //   },
+    // ])
+    socket.emit("send_message", {
+      room: roomName,
+      message: trimmed
+    })
+
     setMessage("")
   }
 
+  //Join Room
   useEffect(() =>{
-
     socket.emit("join_room", roomName)
 
-    return () => {
-    socket.disconnect();
-  };
+  //    return () => {
+  //   socket.emit("leave_room", roomName);
+  // };
   }, [roomName])
+
+  useEffect(()=>{
+    socket.on("receive_message", (data)=>{
+      setMessages((current) => [
+        ...current,
+        {
+        id: Date.now(),
+        user: data.username,
+        text: data.message,
+        time: new Date().toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
+      },
+      ])
+    })
+
+    return () => {
+      socket.off("receive_message");
+    };
+  },[])
 
   return (
     <main className="min-h-screen bg-muted p-6">
@@ -75,6 +122,7 @@ export function RoomPage() {
           <CardHeader className="gap-2">
             <CardTitle className="text-3xl">{roomName}</CardTitle>
             <CardDescription>
+              {/* Descrição da sala */}
               Esta sala mostra as pessoas online e oferece um chat rápido.
             </CardDescription>
           </CardHeader>

@@ -15,12 +15,45 @@ import {
 } from "~/components/ui/field"
 import { Input } from "~/components/ui/input"
 import type React from "react"
-import { handleSubmitLogin } from "~/login/login"
+import { useAuth } from "~/shared/hooks/useAuth"
+import { toast } from "sonner"
+import axios from "axios"
+import { useNavigate } from "react-router"
 
 export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
+
+   const {login} = useAuth();
+   const navigate = useNavigate();
+
+    const handleSubmitLogin = async (e: React.SubmitEvent<HTMLFormElement>) =>{
+    e.preventDefault();
+
+    const formData = new FormData(e.currentTarget);
+    const email = formData.get("email");
+    const password = formData.get("password");
+
+    if (!email || !password) {
+        toast.error("Todos os campos são obrigatórios!");
+        return;
+    }
+
+    try{
+
+        const response = await axios.post(`${import.meta.env.VITE_API_URL}/auth/login`, {
+            email,
+            password
+        })
+        login(response.data.token);
+        toast.success("Login realizado com sucesso!");
+        navigate("/room/1");
+    } catch (error) {
+        console.error(error);
+        toast.error("Erro ao realizar login!");
+    }
+  }
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
