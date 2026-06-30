@@ -50,27 +50,37 @@ io.use((socket, next) => {
 io.on("connection",(socket)=>{
     console.log("Usuário conectado", socket.data.user,);
 
-   socket.on('join_room', (roomId) =>{
-    socket.join(roomId);
-    console.log(`Usuário ${socket.id} entrou na sala`);
-    io.to(roomId).emit('user_joined', {
-        username: socket.data.user.username,
-        message: `Usuário ${socket.data.user.username} entrou na sala`
-    });
-   })
+    socket.on('join_room', (roomId) =>{
+        socket.join(roomId);
+        console.log(`Usuário ${socket.id} entrou na sala`);
+        io.to(roomId).emit('user_joined', {
+            username: socket.data.user.username,
+            message: `Usuário ${socket.data.user.username} entrou na sala`
+        });
+    })
 
-   socket.on("send_message", (data) => {
-    io.to(data.room).emit(
+    socket.on("send_message", (data) => {
+        console.log(data.message)
+        io.to(data.room).emit(
         "receive_message",
         {
+            id: socket.data.user.id,
             username: socket.data.user.username,
             message: data.message,
         }
     );
-    console.log(data.message);
     });
 
-    socket.on("disconnect", (data)=>{
+    socket.on("leave_room", (roomId) => {
+        socket.leave(roomId);
+        console.log(`Usuário ${socket.id} saiu da sala`);
+        io.to(roomId).emit('user_left', {
+            username: socket.data.user.username,
+            message: `Usuário ${socket.data.user.username} saiu da sala`
+        });
+    })
+
+    socket.on("disconnect", ()=>{
         console.log("Usuário desconectado", socket.id);
             io.emit('user_left', {
             username: socket.data.user.username,

@@ -13,9 +13,17 @@ datasource db {
 }
 
 model User {
-  userId  String @id @default(uuid())
-  username String @unique
-  email    String @unique
-  password String
-  createdAt DateTime @default(now())
+  userId    String    @id @default(uuid())
+  username  String    @unique
+  email     String    @unique
+  password  String
+  createdAt DateTime  @default(now())
+}
+
+model messages {
+  id        String    @id @default(uuid())
+  roomId    String    @unique
+  userId    String    @unique
+  message   String 
+  createdAt DateTime  @default(now())
 }
