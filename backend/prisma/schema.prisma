@@ -20,7 +20,7 @@ model User {
   createdAt DateTime  @default(now())
 }
 
-model messages {
+model Messages {
   id        String    @id @default(uuid())
   roomId    String    @unique
   userId    String    @unique

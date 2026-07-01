@@ -8,6 +8,7 @@ import { Server } from "socket.io";
 import { UserRoutes } from "./modules/users/user.routes.js";
 import { AuthRoute } from "./modules/auth/auth.route.js";
 import { JwtUtil, type UserPayload } from "./shared/utils/jwt.util.js";
+import { roomService } from "./modules/rooms/room.routes.js";
 
 const PORT = process.env.PORT || 8000;
 
@@ -48,7 +49,7 @@ io.use((socket, next) => {
 //Posso gerenciar os eventos do socket.io aqui
 
 io.on("connection",(socket)=>{
-    console.log("Usuário conectado", socket.data.user,);
+    console.log("Usuário conectado", socket.data.user);
 
     socket.on('join_room', (roomId) =>{
         socket.join(roomId);
@@ -59,17 +60,28 @@ io.on("connection",(socket)=>{
         });
     })
 
-    socket.on("send_message", (data) => {
-        console.log(data.message)
-        io.to(data.room).emit(
-        "receive_message",
-        {
-            id: socket.data.user.id,
-            username: socket.data.user.username,
-            message: data.message,
-        }
-    );
-    });
+    // socket.on("send_message", (data) => {
+    //     io.to(data.roomId).emit(
+    //     "receive_message",
+    //     {
+    //         id: socket.data.user.id,
+    //         username: socket.data.user.username,
+    //         message: data.message,
+    //     }
+    // );
+    // });
+
+    socket.on("send_message", async (data) =>{
+        //Tenho que fazer uma chamada para verificar se o usuário está na sala antes de salvar a mensagem no banco de dados
+        //Se o usuário não estiver na sala, não salvar a mensagem no banco de dados e retornar um erro
+        // if(!socket.rooms.has(data.roomId)){
+        //     return socket.emit("error", "Usuário nao esta na sala");
+        // }
+        const message = await roomService.saveMessage(data.roomId, socket.data.user.userId, data.message)
+        console.log("Mensagem salva no banco de dados:", message);
+        io.to(data.roomId).emit("receive_message", message);
+    })
+
 
     socket.on("leave_room", (roomId) => {
         socket.leave(roomId);
