@@ -24,6 +24,13 @@ model Messages {
   id        String    @id @default(uuid())
   roomId    String    @unique
   userId    String    @unique
+  username  String
   message   String 
+  createdAt DateTime  @default(now())
+}
+
+model Room {
+  roomId    String    @id @default(uuid())
+  roomName  String    @unique
   createdAt DateTime  @default(now())
 }

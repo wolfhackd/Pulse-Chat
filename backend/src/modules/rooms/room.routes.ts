@@ -13,5 +13,7 @@ export const RoomRoutes = async (app: FastifyInstance) => {
 
     //se der erro é porque a rota e o socket não pode ser a mesma
     // app.get("/", controller.getAllRooms);
-    app.get("/:roomId/messages", controller.getAllMessagesByRoomId)
+    // app.get("/:roomId/messages", controller.getAllMessagesByRoomId)
+    app.get("/", controller.getAllRooms)
+    app.get("/:roomId", controller.getRoomById)
 }

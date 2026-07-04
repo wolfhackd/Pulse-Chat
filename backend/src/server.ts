@@ -8,11 +8,11 @@ import { Server } from "socket.io";
 import { UserRoutes } from "./modules/users/user.routes.js";
 import { AuthRoute } from "./modules/auth/auth.route.js";
 import { JwtUtil, type UserPayload } from "./shared/utils/jwt.util.js";
-import { roomService } from "./modules/rooms/room.routes.js";
+import { RoomRoutes, roomService } from "./modules/rooms/room.routes.js";
 
 const PORT = process.env.PORT || 8000;
 
-const app = fastify({logger:true});
+const app = fastify();
 app.register(cors, {
     origin: "*"
 });
@@ -20,7 +20,7 @@ app.register(cors, {
 // Routes
 app.register(UserRoutes);
 app.register(AuthRoute , {prefix:"/auth"});
-// app.register(RoomRoutes , {prefix:"/rooms"});
+app.register(RoomRoutes , {prefix:"/rooms"});
 
 const io = new Server(app.server,{
     cors:{
@@ -51,25 +51,27 @@ io.use((socket, next) => {
 io.on("connection",(socket)=>{
     console.log("Usuário conectado", socket.data.user);
 
-    socket.on('join_room', (roomId) =>{
-        socket.join(roomId);
-        console.log(`Usuário ${socket.id} entrou na sala`);
-        io.to(roomId).emit('user_joined', {
-            username: socket.data.user.username,
-            message: `Usuário ${socket.data.user.username} entrou na sala`
-        });
-    })
-
-    // socket.on("send_message", (data) => {
-    //     io.to(data.roomId).emit(
-    //     "receive_message",
-    //     {
-    //         id: socket.data.user.id,
-    //         username: socket.data.user.username,
-    //         message: data.message,
-    //     }
-    // );
-    // });
+    //Verificar se a sala existe antes de permitir que o usuário entre nela
+    socket.on('join_room', async (roomId) =>{
+        try {
+            const room = await roomService.findRoomById(roomId);
+            if(!room){
+                return socket.emit("error_join_room", "Sala não existe"); // -----------------------------------------------------------------------
+            }
+    
+    
+            await socket.join(roomId);
+            console.log(`Usuário ${socket.data.user.username} entrou na sala ${room.roomName}`);
+    
+            io.to(roomId).emit('user_joined', {
+                username: socket.data.user.username,
+                message: `Usuário ${socket.data.user.username} entrou na sala ${room.roomName}`
+            });
+        } catch (err) {
+            console.error(err);
+            socket.emit("error", "Erro ao entrar na sala");
+        }}
+    )
 
     socket.on("send_message", async (data) =>{
         //Tenho que fazer uma chamada para verificar se o usuário está na sala antes de salvar a mensagem no banco de dados
@@ -77,7 +79,7 @@ io.on("connection",(socket)=>{
         // if(!socket.rooms.has(data.roomId)){
         //     return socket.emit("error", "Usuário nao esta na sala");
         // }
-        const message = await roomService.saveMessage(data.roomId, socket.data.user.userId, data.message)
+        const message = await roomService.saveMessage(data.roomId, socket.data.user.userId, data.message, socket.data.user.username)
         console.log("Mensagem salva no banco de dados:", message);
         io.to(data.roomId).emit("receive_message", message);
     })
