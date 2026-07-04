@@ -12,11 +12,11 @@ export function meta({}: Route.MetaArgs) {
 }
 
 export default function RoomRoute() {
-  const auth = useAuth();
+  // const auth = useAuth();
 
-  if (!auth?.token) {
-    return <Navigate to="/login" replace />;
-  }
+  // if (!auth?.token) {
+  //   return <Navigate to="/login" replace />;
+  // }
 
   return <RoomPage />;
 }

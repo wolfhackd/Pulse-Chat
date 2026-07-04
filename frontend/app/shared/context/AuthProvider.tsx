@@ -5,6 +5,7 @@ type AuthContextType = {
   token: string | null;
   login: (token: string) => void;
   logout: () => void;
+  loading: boolean;
 };
 
 export const AuthContext = createContext({} as AuthContextType);
@@ -52,6 +53,7 @@ useEffect(() => {
     <AuthContext.Provider
       value={{
         token,
+        loading,
         login,
         logout,
       }}

@@ -11,11 +11,11 @@ export function meta({}: Route.MetaArgs) {
 }
 
 export default function SignupRoute() {
-  const auth = useAuth();
+  // const auth = useAuth();
 
-  if (auth?.token) {
-    return <Navigate to="/room/1" replace />;
-  }
+  // if (auth?.token) {
+  //   return <Navigate to="/room/1" replace />;
+  // }
 
   return <SignupPage />;
 }
