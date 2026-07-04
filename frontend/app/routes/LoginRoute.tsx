@@ -6,7 +6,7 @@ export default function LoginRoute() {
   const auth = useAuth();
 
   if (auth?.token) {
-    return <Navigate to="/room/1" replace />;
+    return <Navigate to="/" replace />;
   }
 
   return <LoginPage />;

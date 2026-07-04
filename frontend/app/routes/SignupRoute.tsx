@@ -1,6 +1,6 @@
 import { Navigate } from "react-router";
 import SignupPage from "~/signup/SignupPage";
-import type { Route } from "./+types/home";
+import type { Route } from "../+types/root";
 import { useAuth } from "~/shared/hooks/useAuth";
 
 export function meta({}: Route.MetaArgs) {

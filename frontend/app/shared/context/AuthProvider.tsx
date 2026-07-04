@@ -14,16 +14,24 @@ type AuthProviderProps = {
 };
 
 export function AuthProvider({ children }: AuthProviderProps) {
-  const [token, setToken] = useState<string | null>(null);
+const [token, setToken] = useState<string | null>(null);
+const [loading, setLoading] = useState(true);
 
- useEffect(() => {
+useEffect(() => {
   const storedToken = localStorage.getItem("token");
 
-  if (!storedToken) return;
+  if (storedToken) {
+    setToken(storedToken);
+  }
 
-  setToken(storedToken);
-  connectSocket();
+  setLoading(false);
 }, []);
+
+ useEffect(() => {
+  if (!token) return;
+
+  connectSocket();
+}, [token]);
 
   function login(newToken: string) {
     localStorage.setItem('token', newToken);
@@ -35,6 +43,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
     localStorage.removeItem('token');
     setToken(null);
   }
+
+  if (loading) {
+  return null;
+}
 
   return (
     <AuthContext.Provider

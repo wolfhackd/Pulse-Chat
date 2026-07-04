@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react"
-import { useParams } from "react-router"
+import { useEffect, useState } from "react";
+import { useParams } from "react-router";
 
-import { Button } from "~/components/ui/button"
+import { Button } from "~/components/ui/button";
 import {
   Card,
   CardContent,
@@ -9,9 +9,11 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "~/components/ui/card"
-import { Input } from "~/components/ui/input"
-import { socket } from "~/config/socket/socket"
+} from "~/components/ui/card";
+import { Input } from "~/components/ui/input";
+import { socket } from "~/config/socket/socket";
+import { findRoomById, type ChatMessage } from "~/rooms/roomApi";
+import type { RoomData } from "~/shared/types/types";
 
 const onlineUsers = [
   { name: "Ana", status: "Editando slides", online: true },
@@ -26,12 +28,6 @@ const initialMessages = [
   { id: 3, user: "João", text: "Estou pronto para o chat.", time: "14:07" },
 ]
 
-type ChatMessage = {
-  id: number
-  user: string
-  text: string
-  time: string
-}
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -54,14 +50,34 @@ type ChatMessage = {
 //
 // --------------------------------------------------------------------------------------------------------------------
 
-export function RoomPage() {
+export default function RoomPage() {
   const params = useParams()
-  const roomName = params.roomId
+  const roomId = params.roomId
     ? decodeURIComponent(params.roomId).replace(/-/g, " ")
     : "Sala de Bate-Papo"
 
   const [message, setMessage] = useState("")
   const [messages, setMessages] = useState<ChatMessage[]>(initialMessages)
+  const [offRoom, setOffRoom] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
+  const [room, setRoom] = useState<RoomData | null>(null)
+
+  //Join Room
+  useEffect(() => {
+    const joinRoom = () => {
+      socket.emit("join_room", roomId);
+    };
+
+    if (socket.connected) {
+      joinRoom();
+    } else {
+      socket.once("connect", joinRoom);
+    }
+
+    return () => {
+      socket.off("connect", joinRoom);
+    };
+  }, [roomId]);
 
   function handleSend(event: React.SubmitEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -70,7 +86,7 @@ export function RoomPage() {
 
     // setMessages((current) => [
     //   ...current,
-    //   {
+    //   {]
     //     id: current.length + 1,
     //     user: "Você",
     //     text: trimmed,
@@ -78,21 +94,65 @@ export function RoomPage() {
     //   },
     // ])
     socket.emit("send_message", {
-      room: roomName,
+      roomId,
       message: trimmed
     })
 
     setMessage("")
   }
 
-  //Join Room
-  useEffect(() =>{
-    socket.emit("join_room", roomName)
+   useEffect(() => {
+    async function loadRoom() {
+      try {
+        setIsLoading(true)
+        const roomData = await findRoomById(roomId)
+        
+        if (!roomData) {
+          setOffRoom(true)
+          return
+        }
+        
+        setRoom(roomData)
+      } catch (error) {
+        console.error("Erro ao buscar sala:", error)
+        setOffRoom(true)
+      } finally {
+        setIsLoading(false)
+      }
+    }
 
-  //    return () => {
-  //   socket.emit("leave_room", roomName);
-  // };
-  }, [roomName])
+    loadRoom()
+  }, [roomId])
+
+  //Join Room
+  useEffect(() => {
+    const joinRoom = () => {
+      socket.emit("join_room", roomId);
+    };
+
+    if (socket.connected) {
+      joinRoom();
+    } else {
+      socket.once("connect", joinRoom);
+    }
+
+    return () => {
+      socket.off("connect", joinRoom);
+    };
+  }, [roomId]);
+
+  useEffect(() => {
+    const handleJoinError = (errorMessage: string) => {
+      alert(errorMessage || "Erro ao entrar na sala");
+      setOffRoom(true);
+    };
+
+    socket.on("join_room_error", handleJoinError);
+
+    return () => {
+      socket.off("join_room_error", handleJoinError);
+    };
+  }, []);
 
   useEffect(()=>{
     socket.on("receive_message", (data)=>{
@@ -115,12 +175,40 @@ export function RoomPage() {
     };
   },[])
 
+  if (isLoading) {
   return (
+    <main className="min-h-screen bg-muted flex items-center justify-center p-6">
+      <p className="text-muted-foreground animate-pulse text-lg">Carregando informações da sala...</p>
+    </main>
+  )
+  }
+
+  //  if (offRoom) {
+  //   return (
+  //     <main className="min-h-screen bg-muted flex items-center justify-center p-6">
+  //       <Card className="max-w-md w-full text-center p-6">
+  //         <CardHeader>
+  //           <CardTitle className="text-destructive text-2xl">Sala Inacessível</CardTitle>
+  //           <CardDescription>
+  //             A sala que você tentou acessar não existe ou foi finalizada.
+  //           </CardDescription>
+  //         </CardHeader>
+  //         <CardFooter className="justify-center">
+  //           <Button onClick={() => window.location.href = '/'}>Voltar para o Início</Button>
+  //         </CardFooter>
+  //       </Card>
+  //     </main>
+  //   )
+  // }
+
+  return (
+    
     <main className="min-h-screen bg-muted p-6">
       <div className="mx-auto flex max-w-7xl flex-col gap-6">
         <Card className="bg-background p-6">
           <CardHeader className="gap-2">
-            <CardTitle className="text-3xl">{roomName}</CardTitle>
+            {/* Tenho que buscar o nome da sala aqui */}
+            <CardTitle className="text-3xl">{room?.roomName}</CardTitle>
             <CardDescription>
               {/* Descrição da sala */}
               Esta sala mostra as pessoas online e oferece um chat rápido.
