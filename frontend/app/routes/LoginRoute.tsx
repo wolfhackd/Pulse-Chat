@@ -1,5 +1,5 @@
 import { Navigate } from "react-router";
-import LoginPage from "~/login/LoginPage";
+import LoginPage from "~/modules/login/LoginPage";
 import { useAuth } from "~/shared/hooks/useAuth";
 
 export default function LoginRoute() {

@@ -1,7 +1,7 @@
 import { Navigate, useNavigate } from "react-router";
 import { useAuth } from "~/shared/hooks/useAuth";
 import type { Route } from "../+types/root";
-import HomePage from "~/home/HomePage";
+import HomePage from "~/modules/home/HomePage";
 
 export function meta({}: Route.MetaArgs) {
   return [

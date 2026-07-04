@@ -1,5 +1,5 @@
 import { Navigate } from "react-router";
-import RoomPage from "~/rooms/RoomPage";
+import RoomPage from "~/modules/rooms/RoomPage";
 import { useAuth } from "~/shared/hooks/useAuth";
 import type { Route } from "../+types/root";
 

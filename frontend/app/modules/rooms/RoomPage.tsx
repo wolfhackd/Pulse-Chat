@@ -12,7 +12,7 @@ import {
 } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
 import { socket } from "~/config/socket/socket";
-import { findRoomById, type ChatMessage } from "~/rooms/roomApi";
+import { findRoomById, type ChatMessage } from "~/modules/rooms/roomApi";
 import type { RoomData } from "~/shared/types/types";
 
 const onlineUsers = [

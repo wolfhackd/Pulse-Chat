@@ -1,5 +1,5 @@
 import { Navigate } from "react-router";
-import SignupPage from "~/signup/SignupPage";
+import SignupPage from "~/modules/signup/SignupPage";
 import type { Route } from "../+types/root";
 import { useAuth } from "~/shared/hooks/useAuth";
 

@@ -14,7 +14,7 @@ import {
   FieldLabel,
 } from "~/components/ui/field"
 import { Input } from "~/components/ui/input"
-import { handleSubmitSignup } from "~/signup/signup"
+import { handleSubmitSignup } from "~/modules/signup/signup"
 
 export function SignupForm({
   className,

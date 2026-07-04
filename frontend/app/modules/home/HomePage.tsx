@@ -1,7 +1,7 @@
 import { Button } from "~/components/ui/button";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
-import { getRooms } from "~/rooms/roomApi";
+import { getRooms } from "~/modules/rooms/roomApi";
 import { useAuth } from "~/shared/hooks/useAuth";
 import type { RoomData } from "~/shared/types/types";
 
