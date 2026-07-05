@@ -48,7 +48,7 @@ export function LoginForm({
         })
         login(response.data.token);
         toast.success("Login realizado com sucesso!");
-        navigate("/room/1");
+        navigate("/room");
     } catch (error) {
         console.error(error);
         toast.error("Erro ao realizar login!");

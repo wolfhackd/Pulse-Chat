@@ -43,11 +43,6 @@ const initialMessages = [
 //  Texto da mensagem
 //  Data da mensagem
 //  Hora da mensagem
-//
-//
-//
-//
-//
 // --------------------------------------------------------------------------------------------------------------------
 
 export default function RoomPage() {

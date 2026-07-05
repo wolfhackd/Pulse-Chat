@@ -1,7 +1,5 @@
-import { Navigate } from "react-router";
 import SignupPage from "~/modules/signup/SignupPage";
 import type { Route } from "../+types/root";
-import { useAuth } from "~/shared/hooks/useAuth";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -11,11 +9,5 @@ export function meta({}: Route.MetaArgs) {
 }
 
 export default function SignupRoute() {
-  // const auth = useAuth();
-
-  // if (auth?.token) {
-  //   return <Navigate to="/room/1" replace />;
-  // }
-
   return <SignupPage />;
 }

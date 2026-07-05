@@ -5,11 +5,11 @@ export const socket = io(import.meta.env.VITE_API_URL,{
 });
 
 
-export const connectSocket = () => {
-  console.log("connectSocket");
-  socket.auth = {
-    token: localStorage.getItem("token"),
-  };
+// export const connectSocket = () => {
+//   console.log("connectSocket");
+//   socket.auth = {
+//     token: localStorage.getItem("token"),
+//   };
 
-  socket.connect();
-};  
+//   socket.connect();
+// };  

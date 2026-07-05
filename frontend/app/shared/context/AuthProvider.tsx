@@ -1,5 +1,4 @@
 import { createContext, useEffect, useState } from 'react';
-import { connectSocket, socket } from '~/config/socket/socket';
 
 type AuthContextType = {
   token: string | null;
@@ -31,7 +30,6 @@ useEffect(() => {
  useEffect(() => {
   if (!token) return;
 
-  connectSocket();
 }, [token]);
 
   function login(newToken: string) {
@@ -40,7 +38,6 @@ useEffect(() => {
   }
 
   function logout() {
-    socket.disconnect();
     localStorage.removeItem('token');
     setToken(null);
   }

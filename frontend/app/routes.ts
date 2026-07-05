@@ -6,7 +6,8 @@ export default [
   route("/signup", "routes/SignupRoute.tsx"),
   route("/login", "routes/LoginRoute.tsx"),
 
-  layout("layouts/ProtectRoute.tsx", [
+  layout("layouts/PrivateLayout.tsx", [
+    route("/room", "routes/HomeRoomRoute.tsx"),
     route("/room/:roomId", "routes/RoomRoute.tsx"),
   ])
 

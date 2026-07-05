@@ -1,10 +1,11 @@
 import { Navigate, Outlet } from "react-router";
+import SocketProvider from "~/config/socket/SocketProvider";
 import { useAuth } from "~/shared/hooks/useAuth";
 
 
 
 
-export default function ProtectRoute() {
+export default function PrivateLayout() {
     const {token, loading} = useAuth();
 
     if (loading) {
@@ -16,6 +17,8 @@ export default function ProtectRoute() {
     }
 
     return (
-        <Outlet />
+        <SocketProvider>
+            <Outlet />
+        </SocketProvider>
     );
 }
