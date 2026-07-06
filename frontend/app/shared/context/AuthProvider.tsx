@@ -1,3 +1,4 @@
+import axios from 'axios';
 import { createContext, useEffect, useState } from 'react';
 
 type AuthContextType = {
@@ -17,21 +18,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
 const [token, setToken] = useState<string | null>(null);
 const [loading, setLoading] = useState(true);
 
-useEffect(() => {
-  const storedToken = localStorage.getItem("token");
-
-  if (storedToken) {
-    setToken(storedToken);
-  }
-
-  setLoading(false);
-}, []);
-
- useEffect(() => {
-  if (!token) return;
-
-}, [token]);
-
   function login(newToken: string) {
     localStorage.setItem('token', newToken);
     setToken(newToken);
@@ -41,6 +27,36 @@ useEffect(() => {
     localStorage.removeItem('token');
     setToken(null);
   }
+
+ useEffect(() => {
+    async function validateSession() {
+      const storedToken = localStorage.getItem("token");
+
+      if (!storedToken) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        await axios.get(`${import.meta.env.VITE_API_URL}/auth/me`, {
+          headers: {
+            Authorization: `Bearer ${storedToken}`,
+          },
+        });
+
+        setToken(storedToken);
+      } catch {
+        logout();
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    validateSession();
+  }, [logout]);
+
+
+  
 
   if (loading) {
   return null;
