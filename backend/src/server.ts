@@ -54,6 +54,7 @@ io.on("connection",(socket)=>{
     //Verificar se a sala existe antes de permitir que o usuário entre nela
     socket.on('join_room', async (roomId) =>{
         try {
+            console.log(`Usuário ${socket.data.user.username} está tentando entrar na sala ${roomId}`);
             const room = await roomService.findRoomById(roomId);
             if(!room){
                 return socket.emit("error_join_room", "Sala não existe"); // -----------------------------------------------------------------------

@@ -5,7 +5,7 @@ export interface AuthenticatedRequest extends FastifyRequest {
   user?: UserPayload;
 }
 
-export const authMiddleware = (req: AuthenticatedRequest, res: FastifyReply, next: any) => {
+export async function authMiddleware(req: AuthenticatedRequest, res: FastifyReply) {
     const authHeader = req.headers.authorization;
 
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -19,7 +19,6 @@ export const authMiddleware = (req: AuthenticatedRequest, res: FastifyReply, nex
 
     req.user = decoded;
     
-    next();
   } catch (error) {
     return res.status(401).send({ message: 'Invalid token or expired' });
   }

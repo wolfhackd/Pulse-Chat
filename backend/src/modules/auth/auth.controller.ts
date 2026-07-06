@@ -1,5 +1,6 @@
 import type { FastifyReply, FastifyRequest } from "fastify";
 import type { AuthService } from "./auth.service.js";
+import type { AuthenticatedRequest } from "../../shared/middlewares/auth.middleware.js";
 
 
 export class AuthController {
@@ -31,6 +32,17 @@ export class AuthController {
                 return reply.status(400).send({ error: error.message });
             }
             return reply.status(401).send({ error: 'Invalid email or password' });
+        }
+    }
+
+    getMe = async (req: AuthenticatedRequest, reply: FastifyReply) =>{
+        try{
+            return reply.status(200).send({ user: req.user });
+        } catch (error) {
+            if (error instanceof Error) {
+                return reply.status(400).send({ error: error.message });
+            }
+            return reply.status(500).send({ error: 'Internal server error' });
         }
     }
 }
