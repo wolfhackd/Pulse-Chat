@@ -1,9 +1,12 @@
 import {type FastifyRequest,type FastifyReply} from "fastify";
 import { JwtUtil, type UserPayload } from "../utils/jwt.util.js";
+import { Socket } from "socket.io";
 
 export interface AuthenticatedRequest extends FastifyRequest {
   user?: UserPayload;
 }
+
+
 
 export async function authMiddleware(req: AuthenticatedRequest, res: FastifyReply) {
     const authHeader = req.headers.authorization;
@@ -21,5 +24,23 @@ export async function authMiddleware(req: AuthenticatedRequest, res: FastifyRepl
     
   } catch (error) {
     return res.status(401).send({ message: 'Invalid token or expired' });
+  }
+}
+
+export async function socketAuth(socket: Socket, next: any){
+  try{
+    const token = socket.handshake.auth.token;
+
+    if(!token){
+      return next(new Error("Token invalid"));
+    }
+
+    const payload = JwtUtil.verifyToken(token);
+
+    socket.data.user = payload;
+
+    next();
+  }catch(err){    
+    next(err);
   }
 }

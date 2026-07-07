@@ -2,7 +2,6 @@ import type { FastifyReply, FastifyRequest } from "fastify";
 import type { AuthService } from "./auth.service.js";
 import type { AuthenticatedRequest } from "../../shared/middlewares/auth.middleware.js";
 
-
 export class AuthController {
     constructor(readonly authService: AuthService) {}
 
@@ -22,7 +21,7 @@ export class AuthController {
             if (email.trim() === '' || password.trim() === '') {
                 throw new Error('Fields cannot be empty');
             }
-            //salvar em cookie
+
             const token = await this.authService.login(email, password);
 
             return reply.status(200).send({ token });

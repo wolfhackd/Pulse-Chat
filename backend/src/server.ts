@@ -9,6 +9,7 @@ import { UserRoutes } from "./modules/users/user.routes.js";
 import { AuthRoute } from "./modules/auth/auth.route.js";
 import { JwtUtil, type UserPayload } from "./shared/utils/jwt.util.js";
 import { RoomRoutes, roomService } from "./modules/rooms/room.routes.js";
+import { socketAuth } from "./shared/middlewares/auth.middleware.js";
 
 const PORT = process.env.PORT || 8000;
 
@@ -46,20 +47,18 @@ io.use((socket, next) => {
   }
 });
 
-//Posso gerenciar os eventos do socket.io aqui
+// io.use(socketAuth);
 
 io.on("connection",(socket)=>{
-    console.log("Usuário conectado", socket.data.user);
+    console.log("Usuário conectado", socket.data.user.username);
 
-    //Verificar se a sala existe antes de permitir que o usuário entre nela
     socket.on('join_room', async (roomId) =>{
         try {
             console.log(`Usuário ${socket.data.user.username} está tentando entrar na sala ${roomId}`);
             const room = await roomService.findRoomById(roomId);
             if(!room){
-                return socket.emit("error_join_room", "Sala não existe"); // -----------------------------------------------------------------------
+                return socket.emit("error_join_room", "Sala não existe");
             }
-    
     
             await socket.join(roomId);
             console.log(`Usuário ${socket.data.user.username} entrou na sala ${room.roomName}`);
@@ -84,7 +83,6 @@ io.on("connection",(socket)=>{
         console.log("Mensagem salva no banco de dados:", message);
         io.to(data.roomId).emit("receive_message", message);
     })
-
 
     socket.on("leave_room", (roomId) => {
         socket.leave(roomId);
