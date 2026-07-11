@@ -13,11 +13,9 @@ export function registerRoomEvents(io: Server, socket: Socket){
             if(!room){
                 return socket.emit("error_join_room", "Sala não existe");
             }
-            console.log(`Usuário ${socket.data.user.username} tentou entrar na sala ${roomId}`);
 
             socket.join(roomId);
 
-            console.log(`Usuário ${socket.data.user.username} entrou na sala ${room.roomName}`);
             io.to(roomId).emit('user_joined', {
                 username: socket.data.user.username,
                 message: `Usuário ${socket.data.user.username} entrou na sala ${room.roomName}`
