@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router";
 
+import { v4 as uuidv4 } from "uuid";
+
 import { Button } from "~/components/ui/button";
 import {
   Card,
@@ -23,9 +25,9 @@ const onlineUsers = [
 ]
 
 const initialMessages = [
-  { id: 1, user: "Ana", text: "Boa tarde, pessoal!", time: "14:05" },
-  { id: 2, user: "Carlos", text: "Vamos revisar a agenda da sala.", time: "14:06" },
-  { id: 3, user: "João", text: "Estou pronto para o chat.", time: "14:07" },
+  { id: "1", username: "Ana", text: "Boa tarde, pessoal!", time: "14:05" },
+  { id: "2", username: "Carlos", text: "Vamos revisar a agenda da sala.", time: "14:06" },
+  { id: "3", username: "João", text: "Estou pronto para o chat.", time: "14:07" },
 ]
 
 
@@ -47,10 +49,7 @@ const initialMessages = [
 
 export default function RoomPage() {
   const params = useParams()
-  const roomId = params.roomId
-    ? decodeURIComponent(params.roomId).replace(/-/g, " ")
-    : "Sala de Bate-Papo"
-
+  const roomId = params.roomId!;
   const [message, setMessage] = useState("")
   const [messages, setMessages] = useState<ChatMessage[]>(initialMessages)
   const [offRoom, setOffRoom] = useState(false)
@@ -77,17 +76,9 @@ export default function RoomPage() {
   function handleSend(event: React.SubmitEvent<HTMLFormElement>) {
     event.preventDefault()
     const trimmed = message.trim()
+
     if (!trimmed) return
 
-    // setMessages((current) => [
-    //   ...current,
-    //   {]
-    //     id: current.length + 1,
-    //     user: "Você",
-    //     text: trimmed,
-    //     time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-    //   },
-    // ])
     socket.emit("send_message", {
       roomId,
       message: trimmed
@@ -119,23 +110,6 @@ export default function RoomPage() {
     loadRoom()
   }, [roomId])
 
-  //Join Room
-  useEffect(() => {
-    const joinRoom = () => {
-      socket.emit("join_room", roomId);
-    };
-
-    if (socket.connected) {
-      joinRoom();
-    } else {
-      socket.once("connect", joinRoom);
-    }
-
-    return () => {
-      socket.off("connect", joinRoom);
-    };
-  }, [roomId]);
-
   useEffect(() => {
     const handleJoinError = (errorMessage: string) => {
       alert(errorMessage || "Erro ao entrar na sala");
@@ -154,9 +128,9 @@ export default function RoomPage() {
       setMessages((current) => [
         ...current,
         {
-        id: Date.now(),
-        user: data.username,
-        text: data.message,
+        id: uuidv4(),
+        username: data.username,
+        text: data.text,
         time: new Date().toLocaleTimeString([], {
           hour: "2-digit",
           minute: "2-digit",
@@ -170,6 +144,23 @@ export default function RoomPage() {
     };
   },[])
 
+  useEffect(() =>{
+    socket.on("user_joined", (data) =>{
+      setMessages((current) => [
+        ...current,
+        {
+        id: uuidv4(),
+        username: data.username,
+        text: data.message,
+        time: new Date().toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
+      },
+      ])
+    })
+  })
+
   if (isLoading) {
   return (
     <main className="min-h-screen bg-muted flex items-center justify-center p-6">
@@ -177,24 +168,6 @@ export default function RoomPage() {
     </main>
   )
   }
-
-  //  if (offRoom) {
-  //   return (
-  //     <main className="min-h-screen bg-muted flex items-center justify-center p-6">
-  //       <Card className="max-w-md w-full text-center p-6">
-  //         <CardHeader>
-  //           <CardTitle className="text-destructive text-2xl">Sala Inacessível</CardTitle>
-  //           <CardDescription>
-  //             A sala que você tentou acessar não existe ou foi finalizada.
-  //           </CardDescription>
-  //         </CardHeader>
-  //         <CardFooter className="justify-center">
-  //           <Button onClick={() => window.location.href = '/'}>Voltar para o Início</Button>
-  //         </CardFooter>
-  //       </Card>
-  //     </main>
-  //   )
-  // }
 
   return (
     
@@ -258,7 +231,7 @@ export default function RoomPage() {
                 {messages.map((item) => (
                   <div key={item.id} className="rounded-3xl bg-muted p-4">
                     <div className="flex items-center justify-between gap-4 text-sm text-muted-foreground">
-                      <span className="font-medium text-foreground">{item.user}</span>
+                      <span className="font-medium text-foreground">{item.username}</span>
                       <span>{item.time}</span>
                     </div>
                     <p className="mt-2 text-base leading-6 text-foreground">{item.text}</p>

@@ -55,9 +55,6 @@ const [loading, setLoading] = useState(true);
     validateSession();
   }, [logout]);
 
-
-  
-
   if (loading) {
   return null;
 }

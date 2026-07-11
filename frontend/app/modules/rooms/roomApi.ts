@@ -1,8 +1,8 @@
 import axios from "axios"
 
 export type ChatMessage = {
-  id: number
-  user: string
+  id: string
+  username: string
   text: string
   time: string
 }

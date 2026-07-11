@@ -24,7 +24,6 @@ export default function HomeRoomPage() {
       loadRooms()
     },[])
 
-
     return (
     <main className="flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10">
       <div className="max-w-2xl rounded-3xl border border-border bg-background p-10 text-center shadow-lg">
