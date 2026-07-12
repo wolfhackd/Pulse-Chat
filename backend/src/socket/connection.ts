@@ -1,15 +1,21 @@
 import type { Server, Socket } from "socket.io";
-import { registerRoomEvents } from "./room.handler.js";
-import { registerChatEvents } from "./chat.handler.js";
-import { registerUserEvents } from "./user.handler.js";
+import { registerRoomEvents } from "./handlers/room.handler.js";
+import { registerChatEvents } from "./handlers/chat.handler.js";
+import { registerUserEvents } from "./handlers/user.handler.js";
+import { onlineUsersService} from "./services/onlineUsers.service.js";
 
 
 
 
 export function registerConnection(io: Server, socket: Socket){
-    console.log("Cliente conectado:", socket.id);
+
+    onlineUsersService.addUser(socket.data.user.userId, socket.id);
 
     registerRoomEvents(io, socket);
     registerChatEvents(io, socket);
     registerUserEvents(io, socket);
+
+    socket.on("disconnect", () =>{
+        onlineUsersService.removeUser(socket.data.user.userId);
+    })
 };

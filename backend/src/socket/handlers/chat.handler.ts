@@ -1,5 +1,5 @@
 import type { Server, Socket } from "socket.io";
-import { roomService as RoomService } from "../modules/rooms/room.routes.js";
+import { roomService as RoomService } from "../../modules/rooms/room.routes.js";
 
 type Message = {
     // id: number;

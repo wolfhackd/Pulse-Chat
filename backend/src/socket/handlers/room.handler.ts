@@ -1,5 +1,5 @@
 import type { Server, Socket } from "socket.io";
-import { roomService } from "../modules/rooms/room.routes.js";
+import { roomService } from "../../modules/rooms/room.routes.js";
 
 
 
@@ -20,6 +20,7 @@ export function registerRoomEvents(io: Server, socket: Socket){
                 username: socket.data.user.username,
                 message: `Usuário ${socket.data.user.username} entrou na sala ${room.roomName}`
             });
+            //tenho que chamar um update de usuários online na sala
         } catch (err) {
             console.error(err);
             socket.emit("error", "Erro ao entrar na sala");
