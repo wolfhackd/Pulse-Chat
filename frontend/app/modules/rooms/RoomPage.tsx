@@ -20,17 +20,21 @@ import type { RoomData } from "~/shared/types/types";
 
 //isso é mais avançado, pois não tenho esse estado de online
 const usersList = [
-  { name: "Ana", status: "Editando slides", online: true },
-  { name: "Carlos", status: "Preparando a pauta", online: true },
-  { name: "João", status: "Aguardando", online: true },
-  { name: "Mariana", status: "Só participando", online: false },
+  // { name: "Ana", status: "Editando slides", online: true },
+  // { name: "Carlos", status: "Preparando a pauta", online: true },
+  // { name: "João", status: "Aguardando", online: true },
+  // { name: "Mariana", status: "Só participando", online: false },
+  { id: "1", username: "Ana", status: "Editando slides", online: true },
+  { id: "2", username: "Carlos", status: "Preparando a pauta", online: true },
+  { id: "3", username: "João", status: "Aguardando", online: true },
+  { id: "4", username: "Mariana", status: "Só participando", online: false },
 ]
 
-const initialMessages = [
-  { id: "1", username: "Ana", text: "Boa tarde, pessoal!", time: "14:05" },
-  { id: "2", username: "Carlos", text: "Vamos revisar a agenda da sala.", time: "14:06" },
-  { id: "3", username: "João", text: "Estou pronto para o chat.", time: "14:07" },
-]
+// const initialMessages = [
+//   { id: "1", username: "Ana", text: "Boa tarde, pessoal!", time: "14:05" },
+//   { id: "2", username: "Carlos", text: "Vamos revisar a agenda da sala.", time: "14:06" },
+//   { id: "3", username: "João", text: "Estou pronto para o chat.", time: "14:07" },
+// ]
 
 type OnlineUser = {
   id: string;
@@ -39,6 +43,14 @@ type OnlineUser = {
   // online: boolean;
 }
 
+type UserList = {
+  id: string;
+  username: string;
+  status: string;
+  online: boolean;
+}
+
+let typingTimeout: NodeJS.Timeout;
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -60,11 +72,12 @@ export default function RoomPage() {
   const params = useParams();
   const roomId = params.roomId!;
   const [message, setMessage] = useState("");
-  const [messages, setMessages] = useState<ChatMessage[]>(initialMessages);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [offRoom, setOffRoom] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [room, setRoom] = useState<RoomData | null>(null);
   const [onlineUsers, setOnlineUsers] = useState<OnlineUser[]>([]);
+  const [typingUsers, setTypingUsers] = useState<String[]>([]);
 
   //Join Room
   useEffect(() => {
@@ -174,13 +187,44 @@ export default function RoomPage() {
   useEffect(() =>{
     socket.on("room:onlineUsers", (data) =>{
       setOnlineUsers(data)
-      console.log(data)
     })
 
     return () => {
       socket.off("room:onlineUsers");
     };
   })
+
+ const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  setMessage(e.target.value);
+
+  socket.emit("typing:start", roomId);
+
+  clearTimeout(typingTimeout);
+
+  typingTimeout = setTimeout(() => {
+    socket.emit("typing:stop", roomId);
+  }, 2000);
+};
+
+useEffect(() => {
+  socket.on("typing:start", (username: string) => {
+    setTypingUsers((current) => {
+      if (current.includes(username)) return current;
+      return [...current, username];
+    });
+  });
+
+  socket.on("typing:stop", (data: { username: string }) => {
+    setTypingUsers((current) => 
+      current.filter((name) => name !== data.username)
+    );
+  });
+
+  return () => {
+    socket.off("typing:start");
+    socket.off("typing:stop");
+  };
+}, []);
 
   if (isLoading) {
   return (
@@ -222,19 +266,18 @@ export default function RoomPage() {
               <CardDescription>Participantes desta sala</CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
-              {usersList.map((user) => (
+              {onlineUsers.map((user) => (
                 <div
-                  key={user.name}
+                  key={user.id + user.username}
                   className="flex items-center justify-between rounded-[28px] border border-border bg-background p-4"
                 >
                   <div>
-                    <p className="font-medium">{user.name}</p>
-                    <p className="text-sm text-muted-foreground">{user.status}</p>
+                    <p className="font-medium">{user.username}</p>
+                    <p className="text-sm text-muted-foreground">Online</p>
                   </div>
                   <span
-                    className={`h-3.5 w-3.5 rounded-full ${
-                      user.online ? "bg-emerald-500" : "bg-slate-400"
-                    }`}
+                  //Se estiver afk fica laranja, se estiver online fica verde
+                    className={`h-3.5 w-3.5 rounded-full bg-emerald-500`}
                   />
                 </div>
               ))}
@@ -250,14 +293,21 @@ export default function RoomPage() {
             <CardContent className="flex-1 overflow-hidden">
               <div className="flex h-full flex-col gap-4 overflow-y-auto pr-2">
                 {messages.map((item) => (
-                  <div key={item.id} className="rounded-3xl bg-muted p-4">
-                    <div className="flex items-center justify-between gap-4 text-sm text-muted-foreground">
-                      <span className="font-medium text-foreground">{item.username}</span>
-                      <span>{item.time}</span>
-                    </div>
-                    <p className="mt-2 text-base leading-6 text-foreground">{item.text}</p>
+                  <div key={item.id} className="rounded-3xl bg-muted p-3">
+                    <p className="font-semibold text-xs">{item.username}</p>
+                    <p className="text-sm">{item.text}</p>
+                    <span className="text-[10px] text-muted-foreground">{item.time}</span>
                   </div>
                 ))}
+
+                {/* INDICADOR DE DIGITANDO */}
+                {typingUsers.length > 0 && (
+                  <div className="text-sm text-muted-foreground italic animate-pulse p-2 bg-muted/50 rounded-xl max-w-fit">
+                    {typingUsers.length === 1
+                      ? `${typingUsers[0]} está digitando...`
+                      : `${typingUsers.join(", ")} estão digitando...`}
+                  </div>
+                )}
               </div>
             </CardContent>
 
@@ -265,7 +315,7 @@ export default function RoomPage() {
               <form onSubmit={handleSend} className="flex flex-col gap-3 sm:flex-row">
                 <Input
                   value={message}
-                  onChange={(event) => setMessage(event.target.value)}
+                  onChange={handleChange}
                   placeholder="Digite uma mensagem..."
                   className="flex-1"
                 />
