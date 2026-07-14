@@ -17,7 +17,9 @@ import { socket } from "~/config/socket/socket";
 import { findRoomById, type ChatMessage } from "~/modules/rooms/roomApi";
 import type { RoomData } from "~/shared/types/types";
 
-const onlineUsers = [
+
+//isso é mais avançado, pois não tenho esse estado de online
+const usersList = [
   { name: "Ana", status: "Editando slides", online: true },
   { name: "Carlos", status: "Preparando a pauta", online: true },
   { name: "João", status: "Aguardando", online: true },
@@ -29,6 +31,13 @@ const initialMessages = [
   { id: "2", username: "Carlos", text: "Vamos revisar a agenda da sala.", time: "14:06" },
   { id: "3", username: "João", text: "Estou pronto para o chat.", time: "14:07" },
 ]
+
+type OnlineUser = {
+  id: string;
+  username: string;
+  // status: string;
+  // online: boolean;
+}
 
 
 
@@ -48,13 +57,14 @@ const initialMessages = [
 // --------------------------------------------------------------------------------------------------------------------
 
 export default function RoomPage() {
-  const params = useParams()
+  const params = useParams();
   const roomId = params.roomId!;
-  const [message, setMessage] = useState("")
-  const [messages, setMessages] = useState<ChatMessage[]>(initialMessages)
-  const [offRoom, setOffRoom] = useState(false)
-  const [isLoading, setIsLoading] = useState(true)
-  const [room, setRoom] = useState<RoomData | null>(null)
+  const [message, setMessage] = useState("");
+  const [messages, setMessages] = useState<ChatMessage[]>(initialMessages);
+  const [offRoom, setOffRoom] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [room, setRoom] = useState<RoomData | null>(null);
+  const [onlineUsers, setOnlineUsers] = useState<OnlineUser[]>([]);
 
   //Join Room
   useEffect(() => {
@@ -161,6 +171,17 @@ export default function RoomPage() {
     })
   })
 
+  useEffect(() =>{
+    socket.on("room:onlineUsers", (data) =>{
+      setOnlineUsers(data)
+      console.log(data)
+    })
+
+    return () => {
+      socket.off("room:onlineUsers");
+    };
+  })
+
   if (isLoading) {
   return (
     <main className="min-h-screen bg-muted flex items-center justify-center p-6">
@@ -185,7 +206,7 @@ export default function RoomPage() {
           <CardContent className="grid gap-4 sm:grid-cols-[1fr_auto]">
             <div className="rounded-3xl bg-muted p-4">
               <p className="text-sm text-muted-foreground">
-                Usuários conectados agora: {onlineUsers.filter((user) => user.online).length}
+                Usuários conectados agora: {onlineUsers.length}
               </p>
             </div>
             <div className="rounded-3xl bg-muted p-4">
@@ -201,7 +222,7 @@ export default function RoomPage() {
               <CardDescription>Participantes desta sala</CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
-              {onlineUsers.map((user) => (
+              {usersList.map((user) => (
                 <div
                   key={user.name}
                   className="flex items-center justify-between rounded-[28px] border border-border bg-background p-4"
