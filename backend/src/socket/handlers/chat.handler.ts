@@ -15,14 +15,14 @@ export function registerChatEvents(io: Server, socket: Socket){
         try{
             const roomId = String(data.roomId);
 
-            console.log(`Usuário ${socket.data.user.username} enviou uma mensagem para a sala ${roomId}: ${data.message}`);
+            // console.log(`Usuário ${socket.data.user.username} enviou uma mensagem para a sala ${roomId}: ${data.message}`);
 
             const message: Message = {
                 username: socket.data.user.username,
                 text: data.message,
             };
             RoomService.saveMessage(roomId, socket.data.user.userId, data.message, socket.data.user.username);
-            console.log(`Mensagem salva no banco de dados para a sala ${roomId}`);
+            // console.log(`Mensagem salva no banco de dados para a sala ${roomId}`);
 
             io.to(roomId).emit("receive_message", message);
         } 
