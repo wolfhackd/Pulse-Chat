@@ -1,0 +1,44 @@
+services:
+  db:
+    image: postgres
+    container_name: voice_chat
+    restart: always
+
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: voice_chat_db
+
+    ports:
+      - "5432:5432"
+
+    volumes:
+      - postgres_data:/var/lib/postgresql
+
+  backend:
+    build:
+      context: ./backend
+    
+    command: sh -c "npx prisma migrate deploy && npm run seed && npm run dev"
+
+    ports:
+      - "8000:8000"
+
+    depends_on:
+      - db
+
+    environment:
+      DATABASE_URL: postgresql://admin:admin@db:5432/voice_chat_db
+
+  frontend:
+    build:
+      context: ./frontend
+
+    ports:
+      - "5173:5173"
+
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:

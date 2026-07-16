@@ -20,21 +20,11 @@ import type { RoomData } from "~/shared/types/types";
 
 //isso é mais avançado, pois não tenho esse estado de online
 const usersList = [
-  // { name: "Ana", status: "Editando slides", online: true },
-  // { name: "Carlos", status: "Preparando a pauta", online: true },
-  // { name: "João", status: "Aguardando", online: true },
-  // { name: "Mariana", status: "Só participando", online: false },
   { id: "1", username: "Ana", status: "Editando slides", online: true },
   { id: "2", username: "Carlos", status: "Preparando a pauta", online: true },
   { id: "3", username: "João", status: "Aguardando", online: true },
   { id: "4", username: "Mariana", status: "Só participando", online: false },
 ]
-
-// const initialMessages = [
-//   { id: "1", username: "Ana", text: "Boa tarde, pessoal!", time: "14:05" },
-//   { id: "2", username: "Carlos", text: "Vamos revisar a agenda da sala.", time: "14:06" },
-//   { id: "3", username: "João", text: "Estou pronto para o chat.", time: "14:07" },
-// ]
 
 type OnlineUser = {
   id: string;
@@ -51,22 +41,6 @@ type UserList = {
 }
 
 let typingTimeout: NodeJS.Timeout;
-
-
-// --------------------------------------------------------------------------------------------------------------------
-//  Join Room
-//  Online/Offline Users
-//  Digitando no chat
-//
-//
-//  Corpo de Mensagem
-//  Preciso de: 
-//  Nome da sala
-//  Nome do usuário
-//  Texto da mensagem
-//  Data da mensagem
-//  Hora da mensagem
-// --------------------------------------------------------------------------------------------------------------------
 
 export default function RoomPage() {
   const params = useParams();

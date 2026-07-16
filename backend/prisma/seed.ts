@@ -11,14 +11,14 @@ async function main() {
     })
     console.log("Salas criadas com sucesso");
 
-    await prisma.user.createMany({
-        data: [
-            {username: "wolf", email: "teste@gmail.com", password: "12345678"},
-            {username: "lobo", email: "example@gmail.com", password: "12345678"},
-        ],
-        skipDuplicates: true
-    });
-    console.log("Usuários criados com sucesso");
+    // await prisma.user.createMany({
+    //     data: [
+    //         {username: "wolf", email: "teste@gmail.com", password: "12345678"},
+    //         {username: "lobo", email: "example@gmail.com", password: "12345678"},
+    //     ],
+    //     skipDuplicates: true
+    // });
+    // console.log("Usuários criados com sucesso");
 }
 
 main().then(() => {
