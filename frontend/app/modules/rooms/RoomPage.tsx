@@ -258,7 +258,7 @@ useEffect(() => {
             </CardContent>
           </Card>
 
-          <Card className="flex min-h-[580px] flex-col">
+          <Card className="flex min-h-[580px] max-h-[580px] flex-col scrollbar-thumb-transparent">
             <CardHeader className="flex-col gap-2">
               <CardTitle>Chat da sala</CardTitle>
               <CardDescription>Digite uma mensagem para conversar com o grupo.</CardDescription>
